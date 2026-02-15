@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+	<nav th:replace="~{layout :: navbar}"></nav>
+
+	<div class="content-wrapper">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-lg-8">
+					<!-- Encabezado -->
+					<div class="mb-4">
+						<h2>
+							<i class="bi bi-person-plus-fill text-primary me-2"></i> <span
+								th:text="${accion == 'nuevo' ? 'Nuevo Cliente' : 'Editar Cliente'}">Formulario
+								Cliente</span>
+						</h2>
+						<p class="text-muted">Complete los datos del cliente</p>
+					</div>
+
+					<!-- Formulario -->
+					<div class="card">
+						<div class="card-body">
+							<form th:action="@{/clientes/guardar}" th:object="${cliente}"
+								method="post">
+								<!-- ID oculto para edición -->
+								<input type="hidden" th:field="*{id}" />
+
+								<!-- Nombre -->
+								<div class="mb-3">
+									<label for="nombre" class="form-label"> <i
+										class="bi bi-person-fill text-primary"></i> Nombre Completo *
+									</label> <input type="text" class="form-control" id="nombre"
+										th:field="*{nombre}" required
+										placeholder="Ej: Juan García Martínez">
+								</div>
+
+								<!-- Edad y Género en la misma fila -->
+								<div class="row">
+									<div class="col-md-6 mb-3">
+										<label for="edad" class="form-label"> <i
+											class="bi bi-calendar-check text-primary"></i> Edad *
+										</label> <input type="number" class="form-control" id="edad"
+											th:field="*{edad}" required min="1" max="120"
+											placeholder="Ej: 25">
+									</div>
+									<div class="col-md-6 mb-3">
+										<label for="genero" class="form-label"> <i
+											class="bi bi-gender-ambiguous text-primary"></i> Género *
+										</label> <select class="form-select" id="genero" th:field="*{genero}"
+											required>
+											<option value="">Seleccione...</option>
+											<option value="Masculino">Masculino</option>
+											<option value="Femenino">Femenino</option>
+										</select>
+									</div>
+								</div>
+
+								<!-- Intolerancia -->
+								<div class="mb-3">
+									<div class="form-check form-switch">
+										<input class="form-check-input" type="checkbox"
+											id="intolerancia" th:field="*{intolerancia}"
+											onchange="toggleDetalleIntolerancia()"> <label
+											class="form-check-label" for="intolerancia"> <i
+											class="bi bi-exclamation-triangle-fill text-warning"></i>
+											¿Tiene alguna intolerancia alimentaria?
+										</label>
+									</div>
+								</div>
+
+								<!-- Detalle de Intolerancia (se muestra solo si intolerancia es true) -->
+								<div class="mb-4" id="detalleIntoleranciaCampo"
+									style="display: none;">
+									<label for="detalleIntolerancia" class="form-label"> <i
+										class="bi bi-file-text text-primary"></i> Detalle de la
+										Intolerancia
+									</label>
+									<textarea class="form-control" id="detalleIntolerancia"
+										th:field="*{detalleIntolerancia}" rows="3"
+										placeholder="Ej: Intolerancia a la lactosa, Celiaquía, Alergia a frutos secos, etc."></textarea>
+									<small class="form-text text-muted"> Describa la
+										intolerancia o alergia alimentaria </small>
+								</div>
+
+								<!-- Botones -->
+								<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+									<a href="/clientes" class="btn btn-secondary"> <i
+										class="bi bi-x-circle me-1"></i>Cancelar
+									</a>
+									<button type="submit" class="btn btn-primary">
+										<i class="bi bi-check-circle-fill me-1"></i>Guardar
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<!-- Información adicional -->
+					<div class="alert alert-info mt-3">
+						<i class="bi bi-info-circle-fill me-2"></i> <strong>Nota:</strong>
+						Los campos marcados con (*) son obligatorios.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer th:replace="~{layout :: footer}"></footer>
+	<div th:replace="~{layout :: scripts}"></div>
+
+	<script>
+        // Función para mostrar/ocultar el campo de detalle de intolerancia
+        function toggleDetalleIntolerancia() {
+            const checkbox = document.getElementById('intolerancia');
+            const detalleDiv = document.getElementById('detalleIntoleranciaCampo');
+            const detalleTextarea = document.getElementById('detalleIntolerancia');
+            
+            if (checkbox.checked) {
+                detalleDiv.style.display = 'block';
+                detalleTextarea.required = true;
+            } else {
+                detalleDiv.style.display = 'none';
+                detalleTextarea.required = false;
+                detalleTextarea.value = '';
+            }
+        }
+
+        // Ejecutar al cargar la página para modo edición
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleDetalleIntolerancia();
+        });
+    </script>
+</body>
+</html>

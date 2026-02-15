@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+	<nav th:replace="~{layout :: navbar}"></nav>
+
+	<div class="content-wrapper">
+		<div class="container-fluid">
+			<!-- Encabezado -->
+			<div class="mb-4">
+				<h2>
+					<i class="bi bi-graph-up text-primary me-2"></i> Dashboard -
+					Informes KPI
+				</h2>
+				<p class="text-muted">Análisis y estadísticas del sistema</p>
+			</div>
+
+			<!-- Gráficos -->
+			<div class="row g-4">
+				<!-- Gráfico 1: Clientes por Género -->
+				<div class="col-lg-6">
+					<div class="card h-100">
+						<div class="card-header bg-primary text-white">
+							<h5 class="mb-0">
+								<i class="bi bi-gender-ambiguous me-2"></i> Clientes por Género
+							</h5>
+						</div>
+						<div class="card-body">
+							<canvas id="chartGenero"></canvas>
+						</div>
+						<div class="card-footer text-muted">
+							<small> <i class="bi bi-info-circle me-1"></i>
+								Distribución de clientes según su género
+							</small>
+						</div>
+					</div>
+				</div>
+
+				<!-- Gráfico 2: Reviews por Valoración -->
+				<div class="col-lg-6">
+					<div class="card h-100">
+						<div class="card-header bg-warning text-dark">
+							<h5 class="mb-0">
+								<i class="bi bi-star-fill me-2"></i> Reviews por Valoración
+								(Estrellas)
+							</h5>
+						</div>
+						<div class="card-body">
+							<canvas id="chartValoracion"></canvas>
+						</div>
+						<div class="card-footer text-muted">
+							<small> <i class="bi bi-info-circle me-1"></i> Cantidad
+								de reviews según calificación de 1 a 5 estrellas
+							</small>
+						</div>
+					</div>
+				</div>
+
+				<!-- Gráfico 3: Clientes por Rango de Edad -->
+				<div class="col-lg-6">
+					<div class="card h-100">
+						<div class="card-header bg-info text-white">
+							<h5 class="mb-0">
+								<i class="bi bi-person-badge me-2"></i> Clientes por Rango de
+								Edad
+							</h5>
+						</div>
+						<div class="card-body">
+							<canvas id="chartEdad"></canvas>
+						</div>
+						<div class="card-footer text-muted">
+							<small> <i class="bi bi-info-circle me-1"></i> Franjas de
+								edad: 0-14, 15-24, 25-34, 35-44, 45-54, 55+
+							</small>
+						</div>
+					</div>
+				</div>
+
+				<!-- Gráfico 4: Clientes con/sin Intolerancias (Gráfico libre personalizado) -->
+				<div class="col-lg-6">
+					<div class="card h-100">
+						<div class="card-header bg-success text-white">
+							<h5 class="mb-0">
+								<i class="bi bi-heart-pulse me-2"></i> Clientes con/sin
+								Intolerancias
+							</h5>
+						</div>
+						<div class="card-body">
+							<canvas id="chartIntolerancia"></canvas>
+						</div>
+						<div class="card-footer text-muted">
+							<small> <i class="bi bi-info-circle me-1"></i> <strong>Justificación:</strong>
+								Este gráfico es útil para identificar qué proporción de clientes
+								requiere atención especial en cuanto a restricciones
+								alimentarias, permitiendo adaptar servicios y menús según sus
+								necesidades.
+							</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer th:replace="~{layout :: footer}"></footer>
+	<div th:replace="~{layout :: scripts}"></div>
+
+	<script>
+        // Configuración común para todos los gráficos
+        Chart.defaults.font.family = "'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif";
+        Chart.defaults.font.size = 14;
+
+        // Gráfico 1: Clientes por Género (Gráfico de Barras)
+        fetch('/informes/api/clientes-genero')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('chartGenero').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Cantidad de Clientes',
+                            data: data.data,
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 99, 132, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de género:', error));
+
+        // Gráfico 2: Reviews por Valoración (Gráfico de Barras Horizontales)
+        fetch('/informes/api/reviews-valoracion')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('chartValoracion').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels.map(v => v + ' ⭐'),
+                        datasets: [{
+                            label: 'Cantidad de Reviews',
+                            data: data.data,
+                            backgroundColor: [
+                                'rgba(220, 53, 69, 0.7)',
+                                'rgba(253, 126, 20, 0.7)',
+                                'rgba(255, 193, 7, 0.7)',
+                                'rgba(13, 202, 240, 0.7)',
+                                'rgba(25, 135, 84, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(220, 53, 69, 1)',
+                                'rgba(253, 126, 20, 1)',
+                                'rgba(255, 193, 7, 1)',
+                                'rgba(13, 202, 240, 1)',
+                                'rgba(25, 135, 84, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de valoración:', error));
+
+        // Gráfico 3: Clientes por Rango de Edad (Gráfico de Línea)
+        fetch('/informes/api/clientes-edad')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('chartEdad').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Cantidad de Clientes',
+                            data: data.data,
+                            backgroundColor: 'rgba(13, 202, 240, 0.2)',
+                            borderColor: 'rgba(13, 202, 240, 1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: 'rgba(13, 202, 240, 1)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de edad:', error));
+
+        // Gráfico 4: Clientes con/sin Intolerancias (Gráfico de Dona/Pie)
+        fetch('/informes/api/clientes-intolerancia')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('chartIntolerancia').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Cantidad de Clientes',
+                            data: data.data,
+                            backgroundColor: [
+                                'rgba(255, 193, 7, 0.7)',
+                                'rgba(25, 135, 84, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 193, 7, 1)',
+                                'rgba(25, 135, 84, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de intolerancia:', error));
+    </script>
+</body>
+</html>

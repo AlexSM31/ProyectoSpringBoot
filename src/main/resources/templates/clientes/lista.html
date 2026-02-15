@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+	<nav th:replace="~{layout :: navbar}"></nav>
+
+	<div class="content-wrapper">
+		<div class="container">
+			<!-- Encabezado -->
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div>
+					<h2 class="mb-0">
+						<i class="bi bi-people-fill text-primary me-2"></i> Lista de
+						Clientes
+					</h2>
+					<p class="text-muted mb-0">Gestión de clientes del sistema</p>
+				</div>
+				<a href="/clientes/nuevo" class="btn btn-primary"> <i
+					class="bi bi-plus-circle me-1"></i>Nuevo Cliente
+				</a>
+			</div>
+
+			<!-- Mensajes de alerta -->
+			<div th:if="${mensaje}"
+				th:class="'alert alert-' + ${tipo} + ' alert-dismissible fade show'"
+				role="alert">
+				<i
+					th:class="'bi ' + (${tipo} == 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill') + ' me-2'"></i>
+				<span th:text="${mensaje}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+
+			<!-- Estadísticas -->
+			<div class="row mb-4">
+				<div class="col-md-4">
+					<div class="card bg-primary text-white">
+						<div class="card-body">
+							<h5 class="card-title">
+								<i class="bi bi-people-fill me-2"></i>Total Clientes
+							</h5>
+							<h2 class="mb-0" th:text="${#lists.size(clientes)}">0</h2>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card bg-success text-white">
+						<div class="card-body">
+							<h5 class="card-title">
+								<i class="bi bi-check-circle-fill me-2"></i>Sin Intolerancias
+							</h5>
+							<h2 class="mb-0"
+								th:text="${#lists.size(clientes.?[intolerancia == false])}">0</h2>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card bg-warning text-white">
+						<div class="card-body">
+							<h5 class="card-title">
+								<i class="bi bi-exclamation-circle-fill me-2"></i>Con
+								Intolerancias
+							</h5>
+							<h2 class="mb-0"
+								th:text="${#lists.size(clientes.?[intolerancia == true])}">0</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tabla de clientes -->
+			<div class="card">
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-striped align-middle">
+							<thead class="table-dark">
+								<tr>
+									<th>ID</th>
+									<th>Nombre</th>
+									<th>Edad</th>
+									<th>Género</th>
+									<th>Intolerancia</th>
+									<th>Detalle</th>
+									<th class="text-center">Acciones</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${#lists.isEmpty(clientes)}">
+									<td colspan="7" class="text-center text-muted py-4"><i
+										class="bi bi-inbox fs-1 d-block mb-2"></i> No hay clientes
+										registrados</td>
+								</tr>
+								<tr th:each="cliente : ${clientes}">
+									<td th:text="${cliente.id}">1</td>
+									<td><strong th:text="${cliente.nombre}">Nombre</strong></td>
+									<td th:text="${cliente.edad}">25</td>
+									<td><span th:if="${cliente.genero == 'Masculino'}"
+										class="badge bg-info"> <i class="bi bi-gender-male"></i>
+											Masculino
+									</span> <span th:if="${cliente.genero == 'Femenino'}"
+										class="badge bg-danger"> <i class="bi bi-gender-female"></i>
+											Femenino
+									</span></td>
+									<td><span th:if="${cliente.intolerancia}"
+										class="badge bg-warning"> <i
+											class="bi bi-exclamation-triangle-fill"></i> Sí
+									</span> <span th:unless="${cliente.intolerancia}"
+										class="badge bg-success"> <i
+											class="bi bi-check-circle-fill"></i> No
+									</span></td>
+									<td><span th:if="${cliente.intolerancia}"
+										th:text="${cliente.detalleIntolerancia}">-</span> <span
+										th:unless="${cliente.intolerancia}" class="text-muted">-</span>
+									</td>
+									<td class="text-center"><a
+										th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
+										class="btn btn-sm btn-warning btn-action me-1" title="Editar">
+											<i class="bi bi-pencil-fill"></i>
+									</a> <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}"
+										class="btn btn-sm btn-danger btn-action"
+										onclick="return confirm('¿Está seguro de eliminar este cliente?')"
+										title="Eliminar"> <i class="bi bi-trash-fill"></i>
+									</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer th:replace="~{layout :: footer}"></footer>
+	<div th:replace="~{layout :: scripts}"></div>
+</body>
+</html>

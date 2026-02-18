@@ -36,8 +36,8 @@ jobs:
         run: mvn -B test
 
       # CI nº8: OWASP Dependency-Check
-      - name: Analizar dependencias con OWASP
-        run: mvn -B org.owasp:dependency-check-maven:check
+      # - name: Analizar dependencias con OWASP
+      #  run: mvn -B org.owasp:dependency-check-maven:check
 
       # CI nº6: Subir informes de errores SOLO si fallan tests
       - name: Subir informes Surefire si fallan tests

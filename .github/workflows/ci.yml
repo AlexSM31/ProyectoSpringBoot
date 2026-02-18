@@ -1,0 +1,49 @@
+name: CI - ProyectoSpringBoot
+
+on:
+  # CI nº1: El Vigilante Universal
+  # Se ejecuta en cualquier push a cualquier rama
+  push:
+  # CI nº1 también podría incluir PR:
+  # pull_request:
+
+jobs:
+  build-test:
+    # CI nº7: Matriz multiplataforma
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # CI nº3: Forzar Java 21 (ZULU)
+      - name: Configurar Java 21 Zulu
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'   # Zulu
+          cache: 'maven'         # CI nº5: cache de dependencias
+
+      # CI nº4: Limpieza y modo batch
+      - name: Compilar en modo batch
+        run: mvn -B clean compile
+
+      # CI nº4 + tests
+      - name: Ejecutar tests en modo batch
+        run: mvn -B test
+
+      # CI nº8: OWASP Dependency-Check
+      - name: Analizar dependencias con OWASP
+        run: mvn -B org.owasp:dependency-check-maven:check
+
+      # CI nº6: Subir informes de errores SOLO si fallan tests
+      - name: Subir informes Surefire si fallan tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-${{ matrix.os }}
+          path: target/surefire-reports/
+          retention-days: 7

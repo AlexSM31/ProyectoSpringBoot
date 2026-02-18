@@ -1,0 +1,24 @@
+name: CD - Despliegue remoto simulado
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scp-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir JAR sin tests
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+      - run: mvn -B package -DskipTests
+
+      - name: (Ejemplo) Copiar JAR por SCP
+        run: |
+          echo "Aquí usaríamos appleboy/scp-action con secrets:"
+          echo "host = \$REMOTE_HOST, user = \$REMOTE_USER, key = \$REMOTE_KEY"
+          echo "y copiaríamos target/*.jar al servidor"

@@ -1,0 +1,16 @@
+name: CI+CD encadenados demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CI: tests OK"
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CD: solo me ejecuto porque CI ha terminado en success"

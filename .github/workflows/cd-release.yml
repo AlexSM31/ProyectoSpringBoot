@@ -1,0 +1,31 @@
+name: CD - Release oficial
+
+on:
+  push:
+    tags:
+      - 'v*'   # v1.0, v1.0.0, etc.
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21 Zulu
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+          cache: 'maven'
+
+      - name: Construir JAR sin tests
+        run: mvn -B package -DskipTests
+
+      - name: Crear Release y adjuntar JAR
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

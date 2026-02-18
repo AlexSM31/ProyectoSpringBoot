@@ -14,7 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ClienteController {
 
 	private final ClienteService clienteService;
-
+	
+	// cambio
 	// 1. Listar todos los clientes
 	@GetMapping
 	public String listar(Model model) {

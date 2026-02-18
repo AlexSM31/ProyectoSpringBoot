@@ -1,0 +1,39 @@
+name: CD - ProyectoSpringBoot
+
+on:
+  # CD nº1: Botón de despliegue manual
+  workflow_dispatch:
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21 Zulu
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+          cache: 'maven'
+
+      # CD nº2: Generar ejecutable (sustituye WAR por JAR)
+      - name: Construir ejecutable sin tests
+        run: mvn -B package -DskipTests
+
+      # CD nº5: Notificador de estado (parte 1, antes de fin)
+      - name: Mostrar mensaje de despliegue
+        run: |
+          echo "Despliegue ejecutado por: ${{ github.actor }}"
+          echo "Fecha: $(date)"
+          echo "Resultado: OK (compilación y empaquetado completados)"
+
+      # CD nº2: Dejar el JAR disponible como artifact
+      - name: Subir JAR como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: proyecto-aura-jar
+          path: target/*.jar
+          retention-days: 30
